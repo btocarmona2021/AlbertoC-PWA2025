@@ -1,12 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <style></style>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .contenedor{
+            width: 300px;
+            height: 200px;
+            margin: auto;
+            background-color: rgb(25, 66, 155);
+            padding:5px 10px;
+            border-radius: 8px;
+                border: 2px solid black;
+            }
+             .parrafo{
+                    background-color: rgb(33, 81, 126);
+                    padding: 6px;
+                    border-radius: 4px;
+                    border: 2px solid white;
+                }
+                </style>
 </head>
 <body>
-    
+        <div id="app">
+            <div class="contenedor">
+                <h4>Nombre: {{nombre}}</h4>
+                <h4>Edad: {{edad}}</h4>
+                <h4>Ciudad: {{ciudad}}</h4>
+                <p class="parrafo">
+                    Hola, mi nombre es {{nombre}}, tengo {{edad}} años y vivo en
+                    {{ciudad}}.
+                </p>
+            </div>
+        </div>
+
+        <script>
+            const { createApp, ref } = Vue;
+
+            createApp({
+                setup() {
+                    const nombre = ref("Ana García");
+                    const edad = ref(30);
+                    const ciudad = ref("Tupungato");
+                    return {
+                        nombre,
+                        edad,
+                        ciudad,
+                    };
+                },
+            }).mount("#app");
+        </script>
 </body>
 </html>
