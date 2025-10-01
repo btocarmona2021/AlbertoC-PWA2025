@@ -1,2 +1,2 @@
 # AlbertoC-PWA2025
-Trabajo Practico N1 de Programacion Web Avanzada
+Trabajo Practico N 1 de Programacion Web Avanzada
