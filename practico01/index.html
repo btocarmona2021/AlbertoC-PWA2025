@@ -89,35 +89,252 @@
             .contador button:hover {
                 background-color: #1e3c72;
             }
+            /* Lista de Tareas */
+            .tareas {
+                width: 320px;
+                background: linear-gradient(135deg, #2a5298, #1e3c72);
+                padding: 20px;
+                border-radius: 10px;
+                border: 2px solid #000;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                margin-top: 20px;
+                color: #e6ecf2;
+            }
+
+            .tareas h2 {
+                text-align: center;
+                margin-bottom: 15px;
+                font-weight: 600;
+            }
+
+            .tareas ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .tareas li {
+                background-color: rgba(255, 255, 255, 0.1);
+                border: 1px solid #ffffff88;
+                border-radius: 8px;
+                padding: 10px 12px;
+                margin-bottom: 10px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: background-color 0.3s ease;
+            }
+
+            .tareas li:hover {
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+            .tareas h3 {
+                font-size: 16px;
+                font-weight: 500;
+                margin: 0;
+                color: #f1f1f1;
+            }
+
+            .tareas input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                accent-color: #1e3c72;
+                cursor: pointer;
+            }
+            .agregar-tarea {
+                width: 320px;
+                background: linear-gradient(135deg, #1e3c72, #2a5298);
+                padding: 20px;
+                border-radius: 10px;
+                border: 2px solid #000;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+                margin-top: 20px;
+                color: #e6ecf2;
+                text-align: center;
+            }
+
+            .agregar-tarea h2 {
+                margin-bottom: 15px;
+                font-weight: 600;
+                font-size: 18px;
+            }
+
+            .form-tarea {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .form-tarea input[type="text"] {
+                padding: 8px;
+                border-radius: 6px;
+                border: none;
+                font-size: 16px;
+                color: #333;
+            }
+
+            .form-tarea .checkbox {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+            }
+
+            .form-tarea button {
+                padding: 10px;
+                border: none;
+                border-radius: 6px;
+                background-color: #2a5298;
+                color: white;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .form-tarea button:hover {
+                background-color: #1e3c72;
+            }
+
+            .error {
+                color: #ffcccc;
+                background-color: #99000033;
+                padding: 6px;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+            .trabajos {
+                display: flex;
+                flex-direction: row;
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+                align-items: flex-start;
+            }
         </style>
     </head>
     <body>
         <div id="app">
-            <div class="contenedor">
-                <h4>Nombre: {{nombre}}</h4>
-                <h4>Edad: {{edad}}</h4>
-                <h4>Ciudad: {{ciudad}}</h4>
-                <p class="parrafo">
-                    Hola, mi nombre es {{nombre}}, tengo {{edad}} años y vivo en
-                    {{ciudad}}.
-                </p>
-            </div>
-            <div class="contador">
-                <h4>Contador = {{contador}}</h4>
-                <button @click="accion('+')">+</button>
-                <button @click="accion('-')">-</button>
+            <div class="trabajos">
+           
+                <div>
+                    <div class="contenedor">
+                        <h4>Nombre: {{nombre}}</h4>
+                        <h4>Edad: {{edad}}</h4>
+                        <h4>Ciudad: {{ciudad}}</h4>
+                        <p class="parrafo">
+                            Hola, mi nombre es {{nombre}}, tengo {{edad}} años y
+                            vivo en {{ciudad}}.
+                        </p>
+                    </div>
+                </div>
+
+              
+                <div>
+                    <div class="contador">
+                        <h4>Contador = {{contador}}</h4>
+                        <button @click="accion('+')">+</button>
+                        <button @click="accion('-')">-</button>
+                    </div>
+                </div>
+
+               
+                <div>
+                    <div class="tareas">
+                        <h2>Total de tareas {{totalTareas}} </h2>
+                        <h2>{{sinCompletar}} Sin completar</h2>
+                        <ul>
+                            <li v-for="tarea in tareas" :key="tarea.id">
+                                <h3>{{ tarea.texto }}</h3>
+                                <input
+                                    type="checkbox"
+                                    :checked="tarea.completada"
+                                />
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="agregar-tarea">
+                        <h2>Agregar nueva tarea</h2>
+                        <div class="form-tarea">
+                            <input
+                                type="text"
+                                v-model="nuevaTarea.texto"
+                                placeholder="Escribe tu tarea"
+                            />
+                            <label class="checkbox">
+                                <input
+                                    type="checkbox"
+                                    v-model="nuevaTarea.completada"
+                                />
+                                ¿Ya está completada?
+                            </label>
+                            <button @click="agregarTarea">Agregar tarea</button>
+                            <p v-if="error" class="error">
+                                Debes escribir una tarea antes de agregar
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
         <script>
-            const { createApp, ref } = Vue;
+            const { createApp, ref, reactive,computed } = Vue;
 
             createApp({
                 setup() {
                     const nombre = ref("Ana García");
                     const edad = ref(30);
                     const ciudad = ref("Tupungato");
+
+                    // Contador
                     const contador = ref(4);
+
+                    // Lista de tareas
+                    const error = ref(false);
+                    const tareas = ref([
+                        {
+                            id: 1,
+                            texto: "Aprender HTML",
+                            completada: true,
+                        },
+                        {
+                            id: 2,
+                            texto: "Aprender CSS",
+                            completada: false,
+                        },
+                        {
+                            id: 3,
+                            texto: "Aprender JavaScript",
+                            completada: false,
+                        },
+                        {
+                            id: 4,
+                            texto: "Aprender React",
+                            completada: true,
+                        },
+                    ]);
+                    const nuevaTarea = reactive({
+                        id: tareas.value.length + 1,
+                        texto: "",
+                        completada: false,
+                    });
+                    const limpiarTarea = () => {
+                        nuevaTarea.texto = "";
+                        nuevaTarea.completada = false;
+                        error.value = false;
+                    };
+                    const agregarTarea = () => {
+                        if (!nuevaTarea.texto) {
+                            error.value = true;
+                            return;
+                        }
+                        tareas.value.push({
+                            id: nuevaTarea.id,
+                            texto: nuevaTarea.texto,
+                            completada: nuevaTarea.completada,
+                        });
+                        limpiarTarea();
+                    };
                     const accion = (signo) => {
                         if (signo == "+") {
                             contador.value += 1;
@@ -125,13 +342,25 @@
                             contador.value -= 1;
                         }
                     };
+                    const totalTareas =computed(() => {
+                        return tareas.value.length
+                    });
+                     const sinCompletar =computed(() => {
+                        return tareas.value.filter(tarea => !tarea.completada).length
+                    });
 
                     return {
                         nombre,
                         edad,
                         ciudad,
                         contador,
+                        tareas,
+                        nuevaTarea,
+                        error,
+                        totalTareas,
+                        sinCompletar,
                         accion,
+                        agregarTarea,
                     };
                 },
             }).mount("#app");
