@@ -215,7 +215,6 @@
     <body>
         <div id="app">
             <div class="trabajos">
-           
                 <div>
                     <div class="contenedor">
                         <h4>Nombre: {{nombre}}</h4>
@@ -227,8 +226,8 @@
                         </p>
                     </div>
                 </div>
-
-              
+                 <div>
+                   
                 <div>
                     <div class="contador">
                         <h4>Contador = {{contador}}</h4>
@@ -237,10 +236,9 @@
                     </div>
                 </div>
 
-               
                 <div>
                     <div class="tareas">
-                        <h2>Total de tareas {{totalTareas}} </h2>
+                        <h2>Total de tareas {{totalTareas}}</h2>
                         <h2>{{sinCompletar}} Sin completar</h2>
                         <ul>
                             <li v-for="tarea in tareas" :key="tarea.id">
@@ -275,17 +273,38 @@
                     </div>
                 </div>
             </div>
+             <div class="tareas">
+                        <h2>Total de eventos {{listaeventos.length}}</h2>
+                        
+                        <ul>
+                            <li v-for="ev in listaeventos" :key="ev.id">
+                                <h6>{{ ev.nombre }}</h6>
+                                <h6>{{ ev.timestamp }}</h6>
+
+                            </li>
+                        </ul>
+                    </div>
         </div>
 
         <script>
-            const { createApp, ref, reactive,computed } = Vue;
+            const {
+                createApp,
+                ref,
+                reactive,
+                computed,
+                onBeforeMount,
+                onMounted,
+                onBeforeUpdate,
+                onUpdated,
+                onBeforeUnmount,
+                onUnmounted,
+            } = Vue;
 
             createApp({
                 setup() {
                     const nombre = ref("Ana García");
                     const edad = ref(30);
                     const ciudad = ref("Tupungato");
-
                     // Contador
                     const contador = ref(4);
 
@@ -313,6 +332,11 @@
                             completada: true,
                         },
                     ]);
+
+                    const listaeventos = ref([]);
+
+                    console.log(listaeventos);
+
                     const nuevaTarea = reactive({
                         id: tareas.value.length + 1,
                         texto: "",
@@ -323,6 +347,7 @@
                         nuevaTarea.completada = false;
                         error.value = false;
                     };
+
                     const agregarTarea = () => {
                         if (!nuevaTarea.texto) {
                             error.value = true;
@@ -342,12 +367,29 @@
                             contador.value -= 1;
                         }
                     };
-                    const totalTareas =computed(() => {
-                        return tareas.value.length
+                    const totalTareas = computed(() => {
+                        return tareas.value.length;
                     });
-                     const sinCompletar =computed(() => {
-                        return tareas.value.filter(tarea => !tarea.completada).length
+                    const sinCompletar = computed(() => {
+                        return tareas.value.filter((tarea) => !tarea.completada)
+                            .length;
                     });
+
+                    const evento = (ciclo) => {
+                        const nuevoEvento = {
+                            id: listaeventos.value.length + 1,
+                            nombre: ciclo,
+                            timestamp: new Date().toISOString(),
+                        };
+                        listaeventos.value.push(nuevoEvento);
+                    };
+
+                    onBeforeMount(() => evento("beforeMount"));
+                    onMounted(() => evento("mounted"));
+                    onBeforeUpdate(() => evento("beforeUpdate"));
+                    onUpdated(() => evento("updated"));
+                    onBeforeUnmount(() => evento("beforeUnmount"));
+                    onUnmounted(() => evento("unmounted"));
 
                     return {
                         nombre,
@@ -361,6 +403,8 @@
                         sinCompletar,
                         accion,
                         agregarTarea,
+                        evento,
+                        listaeventos,
                     };
                 },
             }).mount("#app");
