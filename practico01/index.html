@@ -11,6 +11,8 @@
         />
         <title>Trabajo Practico 01</title>
         <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
         <style>
             * {
                 box-sizing: border-box;
@@ -89,6 +91,7 @@
             .contador button:hover {
                 background-color: #1e3c72;
             }
+
             /* Lista de Tareas */
             .tareas {
                 width: 320px;
@@ -141,6 +144,7 @@
                 accent-color: #1e3c72;
                 cursor: pointer;
             }
+
             .agregar-tarea {
                 width: 320px;
                 background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -202,6 +206,7 @@
                 border-radius: 4px;
                 font-size: 14px;
             }
+
             .trabajos {
                 display: flex;
                 flex-direction: row;
@@ -212,6 +217,7 @@
             }
         </style>
     </head>
+
     <body>
         <div id="app">
             <div class="trabajos">
@@ -226,66 +232,78 @@
                         </p>
                     </div>
                 </div>
-                 <div>
-                   
                 <div>
-                    <div class="contador">
-                        <h4>Contador = {{contador}}</h4>
-                        <button @click="accion('+')">+</button>
-                        <button @click="accion('-')">-</button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="tareas">
-                        <h2>Total de tareas {{totalTareas}}</h2>
-                        <h2>{{sinCompletar}} Sin completar</h2>
-                        <ul>
-                            <li v-for="tarea in tareas" :key="tarea.id">
-                                <h3>{{ tarea.texto }}</h3>
-                                <input
-                                    type="checkbox"
-                                    :checked="tarea.completada"
-                                />
-                            </li>
+                        <h3 style="color: #333;">Post</h3>
+                        <ul v-for="p in post" :key="p.id" class="contenedor">
+                            <li>{{ p.body }}</li>
                         </ul>
                     </div>
-                    <div class="agregar-tarea">
-                        <h2>Agregar nueva tarea</h2>
-                        <div class="form-tarea">
-                            <input
-                                type="text"
-                                v-model="nuevaTarea.texto"
-                                placeholder="Escribe tu tarea"
-                            />
-                            <label class="checkbox">
+                    <div>
+                    <h3 style="color: #333;">Comentarios del Post</h3>
+                    <ul v-for="c in comments" :key="c.id" class="contenedor">
+                        <li>{{ c.name }}</li>
+                    </ul>
+                </div>
+                <div>
+                    <div>
+                        <div class="contador">
+                            <h4>Contador = {{contador}}</h4>
+                            <button @click="accion('+')">+</button>
+                            <button @click="accion('-')">-</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="tareas">
+                            <h2>Total de tareas {{totalTareas}}</h2>
+                            <h2>{{sinCompletar}} Sin completar</h2>
+                            <ul>
+                                <li v-for="tarea in tareas" :key="tarea.id">
+                                    <h3>{{ tarea.texto }}</h3>
+                                    <input
+                                        type="checkbox"
+                                        :checked="tarea.completada"
+                                    />
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="agregar-tarea">
+                            <h2>Agregar nueva tarea</h2>
+                            <div class="form-tarea">
                                 <input
-                                    type="checkbox"
-                                    v-model="nuevaTarea.completada"
+                                    type="text"
+                                    v-model="nuevaTarea.texto"
+                                    placeholder="Escribe tu tarea"
                                 />
-                                ¿Ya está completada?
-                            </label>
-                            <button @click="agregarTarea">Agregar tarea</button>
-                            <p v-if="error" class="error">
-                                Debes escribir una tarea antes de agregar
-                            </p>
+                                <label class="checkbox">
+                                    <input
+                                        type="checkbox"
+                                        v-model="nuevaTarea.completada"
+                                    />
+                                    ¿Ya está completada?
+                                </label>
+                                <button @click="agregarTarea">
+                                    Agregar tarea
+                                </button>
+                                <p v-if="error" class="error">
+                                    Debes escribir una tarea antes de agregar
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="tareas">
+                    <h2>Total de eventos {{listaeventos.length}}</h2>
+
+                    <ul>
+                        <li v-for="ev in listaeventos" :key="ev.id">
+                            <h6>{{ ev.nombre }}</h6>
+                            <h6>{{ ev.timestamp }}</h6>
+                        </li>
+                    </ul>
+                </div>
             </div>
-             <div class="tareas">
-                        <h2>Total de eventos {{listaeventos.length}}</h2>
-                        
-                        <ul>
-                            <li v-for="ev in listaeventos" :key="ev.id">
-                                <h6>{{ ev.nombre }}</h6>
-                                <h6>{{ ev.timestamp }}</h6>
-
-                            </li>
-                        </ul>
-                    </div>
         </div>
-
         <script>
             const {
                 createApp,
@@ -307,6 +325,9 @@
                     const ciudad = ref("Tupungato");
                     // Contador
                     const contador = ref(4);
+                    const post = ref([]);
+                    const comments = ref([]);
+                    const listaeventos = ref([]);
 
                     // Lista de tareas
                     const error = ref(false);
@@ -332,10 +353,6 @@
                             completada: true,
                         },
                     ]);
-
-                    const listaeventos = ref([]);
-
-                    console.log(listaeventos);
 
                     const nuevaTarea = reactive({
                         id: tareas.value.length + 1,
@@ -375,6 +392,8 @@
                             .length;
                     });
 
+                    // Paso #1 – Lista de eventos
+
                     const evento = (ciclo) => {
                         const nuevoEvento = {
                             id: listaeventos.value.length + 1,
@@ -384,12 +403,40 @@
                         listaeventos.value.push(nuevoEvento);
                     };
 
-                    onBeforeMount(() => evento("beforeMount"));
-                    onMounted(() => evento("mounted"));
+                    onBeforeMount(() => {
+                        evento("beforeMount");
+                        obtenerPost(1);
+                        obtenerComments(1);
+                    });
+                    onMounted(() => {
+                        evento("mounted");
+                    });
                     onBeforeUpdate(() => evento("beforeUpdate"));
                     onUpdated(() => evento("updated"));
                     onBeforeUnmount(() => evento("beforeUnmount"));
                     onUnmounted(() => evento("unmounted"));
+
+                    // Paso #2 – Implementación de Axios
+
+                    const obtenerPost = async (postId) => {
+                        respuesta = await axios.get(
+                            `https://jsonplaceholder.typicode.com/posts/${postId}`
+                        );
+
+                        post.value.push(respuesta.data);
+                    };
+                    const obtenerComments = async (postId) => {
+                        respuesta = await axios.get(
+                            `https://jsonplaceholder.typicode.com/posts/${postId}/comments/`
+                        );
+                        for (
+                            let index = 0;
+                            index < respuesta.data.length;
+                            index++
+                        ) {
+                            comments.value.push(respuesta.data[index]);
+                        }
+                    };
 
                     return {
                         nombre,
@@ -405,6 +452,8 @@
                         agregarTarea,
                         evento,
                         listaeventos,
+                        post,
+                        comments,
                     };
                 },
             }).mount("#app");
