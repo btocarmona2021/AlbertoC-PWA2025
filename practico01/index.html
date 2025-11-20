@@ -232,18 +232,21 @@
                         </p>
                     </div>
                 </div>
+                
                 <div>
                         <h3 style="color: #333;">Post</h3>
                         <ul v-for="p in post" :key="p.id" class="contenedor">
-                            <li>{{ p.body }}</li>
+                            <li @click="obtenerComments(p.id)">{{ p.body }}</li>
                         </ul>
                     </div>
                     <div>
                     <h3 style="color: #333;">Comentarios del Post</h3>
-                    <ul v-for="c in comments" :key="c.id" class="contenedor">
-                        <li>{{ c.name }}</li>
-                    </ul>
+                    <ol v-for="comment in comments" :key="comment.id" class="contenedor">
+                        <li v-for="c in comment">{{ c.name }}</li>
+                        
+                    </ol>
                 </div>
+                
                 <div>
                     <div>
                         <div class="contador">
@@ -252,7 +255,7 @@
                             <button @click="accion('-')">-</button>
                         </div>
                     </div>
-
+                    
                     <div>
                         <div class="tareas">
                             <h2>Total de tareas {{totalTareas}}</h2>
@@ -291,8 +294,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="tareas">
+                     <div class="tareas">
                     <h2>Total de eventos {{listaeventos.length}}</h2>
 
                     <ul>
@@ -302,7 +304,9 @@
                         </li>
                     </ul>
                 </div>
+                </div>
             </div>
+            
         </div>
         <script>
             const {
@@ -397,19 +401,20 @@
                     const evento = (ciclo) => {
                         const nuevoEvento = {
                             id: listaeventos.value.length + 1,
-                            nombre: ciclo,
+                            nombre: ciclo,  
                             timestamp: new Date().toISOString(),
                         };
-                        listaeventos.value.push(nuevoEvento);
+                        if (listaeventos.value.length <= 34) {
+                            listaeventos.value.push(nuevoEvento);
+                        }
                     };
 
                     onBeforeMount(() => {
                         evento("beforeMount");
-                        obtenerPost(1);
-                        obtenerComments(1);
                     });
                     onMounted(() => {
                         evento("mounted");
+                        losDiezPosts()
                     });
                     onBeforeUpdate(() => evento("beforeUpdate"));
                     onUpdated(() => evento("updated"));
@@ -424,18 +429,20 @@
                         );
 
                         post.value.push(respuesta.data);
+                        
                     };
                     const obtenerComments = async (postId) => {
                         respuesta = await axios.get(
                             `https://jsonplaceholder.typicode.com/posts/${postId}/comments/`
                         );
-                        for (
-                            let index = 0;
-                            index < respuesta.data.length;
-                            index++
-                        ) {
-                            comments.value.push(respuesta.data[index]);
+                        comments.value.push(respuesta.data);
+                    };
+
+                    const losDiezPosts = async () => {
+                        for (let id = 1; id <= 10; id++) {
+                            await obtenerPost(id);
                         }
+                        
                     };
 
                     return {
@@ -454,6 +461,7 @@
                         listaeventos,
                         post,
                         comments,
+                        obtenerComments
                     };
                 },
             }).mount("#app");
